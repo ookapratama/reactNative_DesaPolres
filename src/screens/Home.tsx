@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
   VirtualizedList,
@@ -57,6 +58,10 @@ const Home = () => {
           />
         </TouchableOpacity>
       </View>
+      <TextInput
+        style={styles.inputFilter}
+        placeholder="Silahkan Cari nama desa atau kecamantan"
+      />
       <Text style={styles.txtTitle}>Daftar Desa</Text>
       <SafeAreaView>
         {/* {dataDesa.map((item) => (
@@ -165,5 +170,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     textTransform: "uppercase",
+  },
+  inputFilter: {
+    fontSize: 18,
+    padding: 10,
+    margin: 20,
+    borderRadius: 5,
+    borderColor: "black",
+    borderWidth: 2,
   },
 });
