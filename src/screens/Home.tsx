@@ -1,20 +1,36 @@
 import {
   Alert,
   Image,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  VirtualizedList,
 } from "react-native";
 import Cards from "../components/Cards";
-import { Lato_900Black } from "@expo-google-fonts/lato";
-import { useFonts } from "expo-font";
+// import { Lato_900Black } from "@expo-google-fonts/lato";
+// import { useFonts } from "expo-font";
+import { useEffect, useState } from "react";
+import { getDesa } from "../services/desaService";
 
 const Home = () => {
-  const [fontLoaded] = useFonts({
-    Lato_900Black,
-  });
+  const [dataDesa, setDataDesa] = useState([]);
+  console.log(dataDesa.length);
+  // const [fontLoaded] = useFonts({
+  //   Lato_900Black,
+  // });
+
+  const getData = async () => {
+    const data = await getDesa();
+    setDataDesa(data.results);
+    // console.log(data.map(i => i));
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -30,21 +46,21 @@ const Home = () => {
         </TouchableOpacity>
       </View>
       <Text style={styles.txtTitle}>Daftar Desa</Text>
-      <ScrollView>
-        <Cards desa={"Desa 1"} kecamatan={"Kecamatan 1"} />
-        <Cards desa={"Desa 2"} kecamatan={"Kecamatan 2"} />
-        <Cards desa={"Desa 3"} kecamatan={"Kecamatan 3"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-        <Cards desa={"Desa 4"} kecamatan={"Kecamatan 4"} />
-      </ScrollView>
+      <SafeAreaView>
+        {/* {dataDesa.map((item) => (
+          <Cards id={item.id} desa={item.desa} kecamatan={item.kecamatan} />
+        ))} */}
+
+        <VirtualizedList
+          data={dataDesa}
+          getItemCount={(item) => item.length}
+          getItem={(data, index) => data[index]}
+          initialNumToRender={5}
+          renderItem={({ item }) => (
+            <Cards id={item.id} desa={item.desa} kecamatan={item.kecamatan} />
+          )}
+        />
+      </SafeAreaView>
       <TouchableOpacity>
         <Image
           style={styles.iconWA}
@@ -85,7 +101,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   txtTitle: {
-    fontFamily: "Lato_900Black",
+    // fontFamily: "Lato_900Black",
     fontSize: 30,
     fontWeight: "bold",
     paddingHorizontal: 20,
