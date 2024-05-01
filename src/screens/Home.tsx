@@ -1,8 +1,11 @@
 import {
+  ActivityIndicator,
   Alert,
+  Button,
   Image,
+  Linking,
+  Modal,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,33 +15,42 @@ import {
 import Cards from "../components/Cards";
 // import { Lato_900Black } from "@expo-google-fonts/lato";
 // import { useFonts } from "expo-font";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getDesa } from "../services/desaService";
+import { A } from "@expo/html-elements";
+import { BASE_URL_CONTACT as WA } from "../../env";
 
 const Home = () => {
   const [dataDesa, setDataDesa] = useState([]);
-  console.log(dataDesa.length);
-  // const [fontLoaded] = useFonts({
-  //   Lato_900Black,
-  // });
+  const [loading, setLoading] = useState(true);
+  const [visibleModal, setVisibleModal] = useState(false);
 
   const getData = async () => {
     const data = await getDesa();
     setDataDesa(data.results);
-    // console.log(data.map(i => i));
+    setLoading(false);
+  };
+
+  const guideImage = ({ value }) => {};
+
+  const redirectWA = () => {
+    console.log("object");
+    Linking.openURL(WA);
   };
 
   useEffect(() => {
-    getData();
+    setLoading(true);
+    setTimeout(() => {
+      getData();
+      setLoading(false);
+    }, 3000);
   }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.txtTotal}>Total Desa : 9999</Text>
-        <TouchableOpacity
-          onPress={() => Alert.alert("Sukses", "Instruksi Penggunaan Aplikasi")}
-        >
+        <Text style={styles.txtTotal}>Total Desa : {dataDesa.length}</Text>
+        <TouchableOpacity onPress={() => setVisibleModal(true)}>
           <Image
             style={styles.iconInstruct}
             source={require("../../assets/info.png")}
@@ -50,23 +62,55 @@ const Home = () => {
         {/* {dataDesa.map((item) => (
           <Cards id={item.id} desa={item.desa} kecamatan={item.kecamatan} />
         ))} */}
-
-        <VirtualizedList
-          data={dataDesa}
-          getItemCount={(item) => item.length}
-          getItem={(data, index) => data[index]}
-          initialNumToRender={5}
-          renderItem={({ item }) => (
-            <Cards id={item.id} desa={item.desa} kecamatan={item.kecamatan} />
-          )}
-        />
+        {loading ? (
+          <View style={styles.loading}>
+            <ActivityIndicator size="Large" color="blue" animating />
+          </View>
+        ) : (
+          <VirtualizedList
+            data={dataDesa}
+            getItemCount={(item) => item.length}
+            getItem={(data, index) => data[index]}
+            initialNumToRender={5}
+            renderItem={({ item }) => (
+              <Cards id={item.id} desa={item.desa} kecamatan={item.kecamatan} />
+            )}
+          />
+        )}
       </SafeAreaView>
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => redirectWA()}
+        style={{ position: "absolute", bottom: 15, right: 15 }}
+      >
         <Image
           style={styles.iconWA}
           source={require("../../assets/whatsapp.png")}
         />
       </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visibleModal}
+        onRequestClose={() => {
+          setVisibleModal(false);
+        }}
+      >
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.7)",
+          }}
+        >
+          <Image
+            source={require("../../assets/guide.jpeg")}
+            resizeMode="contain"
+            style={{ width: "70%", height: "70%" }}
+          />
+          <Button title="Kembali" onPress={() => setVisibleModal(false)} />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -77,6 +121,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#eee",
+  },
+  loading: {
+    justifyContent: "center",
+    alignSelf: "center",
+    padding: 30,
   },
   topBar: {
     height: "15%",
@@ -91,9 +140,9 @@ const styles = StyleSheet.create({
   iconWA: {
     width: 80,
     height: 80,
-    position: "absolute",
-    bottom: 15,
-    right: 15,
+    // position: "absolute",
+    // bottom: 15,
+    // right: 15,
   },
   iconInstruct: {
     width: 50,

@@ -1,5 +1,5 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import { Clipboard, Image, StyleSheet, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
 // import { useFonts } from "expo-font";
 // import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 
@@ -8,7 +8,21 @@ const Cards = ({ desa, kecamatan, id }) => {
   //   Lato_400Regular,
   //   Lato_700Bold,
   // });
+  const [textClipboard, setTextClipboard] = useState("");
 
+  const copyNamaDesa = () => {
+    console.log("desa", desa);
+    Clipboard.setString(desa)
+    ToastAndroid.showWithGravityAndOffset(
+      "Nama desa berhasil di copy ke clipboard!",
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+      25,
+      50
+    );
+  };
+  
+  // console.log(desa)
   return (
     <TouchableOpacity key={id}>
       <View style={styles.container}>
@@ -16,7 +30,7 @@ const Cards = ({ desa, kecamatan, id }) => {
           <Text style={styles.txtNamaDesa}>{desa}</Text>
           <Text style={styles.txtNamaKec}>{kecamatan}</Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => copyNamaDesa()}>
           <Image
             style={styles.iconCopy}
             source={require("../../assets/write.png")}
@@ -57,7 +71,7 @@ const styles = StyleSheet.create({
   txtNamaDesa: {
     // fontFamily: "Lato_700Bold",
     fontSize: 22,
-    paddingBottom: 6
+    paddingBottom: 6,
   },
   txtNamaKec: {
     // fontFamily: "Lato_400Regular",
