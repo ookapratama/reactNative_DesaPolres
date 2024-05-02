@@ -18,13 +18,15 @@ import Cards from "../components/Cards";
 // import { useFonts } from "expo-font";
 import { useCallback, useEffect, useState } from "react";
 import { getDesa } from "../services/desaService";
-import { A } from "@expo/html-elements";
 import { BASE_URL_CONTACT as WA } from "../../env";
+import _ from "lodash";
 
 const Home = () => {
   const [dataDesa, setDataDesa] = useState([]);
   const [loading, setLoading] = useState(true);
   const [visibleModal, setVisibleModal] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [filterData, setFilterData] = useState([]);
 
   const getData = async () => {
     const data = await getDesa();
@@ -32,7 +34,22 @@ const Home = () => {
     setLoading(false);
   };
 
-  const guideImage = ({ value }) => {};
+  const handleSearching = (value: any) => {
+    console.log(value);
+    setSearchValue(value);
+    const filtered = dataDesa.filter(
+      (item) =>
+        item.desa.toLowerCase().includes(value.toLowerCase()) ||
+        item.kecamatan.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilterData(filtered);
+  };
+  const debounceSearch = _.debounce(handleSearching, 200);
+
+  const handleChangeText = (value: any) => {
+    setSearchValue(value);
+    debounceSearch(value);
+  };
 
   const redirectWA = () => {
     console.log("object");
@@ -58,10 +75,19 @@ const Home = () => {
           />
         </TouchableOpacity>
       </View>
-      <TextInput
-        style={styles.inputFilter}
-        placeholder="Silahkan Cari nama desa atau kecamantan"
-      />
+      <View style={[styles.inputFilter, { flexDirection: "row" }]}>
+        <Image
+          style={{ width: 25, height: 25, marginRight: 10 }}
+          source={require("../../assets/search.png")}
+        />
+        <TextInput
+          style={{ fontSize: 16 }}
+          cursorColor={"black"}
+          placeholder="Silahkan Cari nama desa atau kecamantan"
+          onChangeText={(value) => handleChangeText(value)}
+          value={searchValue}
+        />
+      </View>
       <Text style={styles.txtTitle}>Daftar Desa</Text>
       <SafeAreaView>
         {/* {dataDesa.map((item) => (
@@ -73,10 +99,10 @@ const Home = () => {
           </View>
         ) : (
           <VirtualizedList
-            data={dataDesa}
+            data={filterData.length > 0 ? filterData : dataDesa}
             getItemCount={(item) => item.length}
             getItem={(data, index) => data[index]}
-            initialNumToRender={5}
+            initialNumToRender={7}
             renderItem={({ item }) => (
               <Cards id={item.id} desa={item.desa} kecamatan={item.kecamatan} />
             )}
@@ -172,7 +198,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   inputFilter: {
-    fontSize: 18,
     padding: 10,
     margin: 20,
     borderRadius: 5,
