@@ -26,7 +26,7 @@ const Splash = () => {
       >
         <Image
           style={styles.imageSplash}
-          source={require("../../assets/police.png")}
+          source={require("../../assets/sibarani.png")}
           resizeMode="contain"
         />
       </Animatable.View>

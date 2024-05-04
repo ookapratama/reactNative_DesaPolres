@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "RN_DesaPolres",
+    "name": "SIBARANI",
     "slug": "RN_DesaPolres",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/adaptive-sibarani.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -19,15 +19,21 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-sibarani.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ookapratama.SIBARANI"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "560ec612-c776-4d35-92ad-6a2b1bfbff00"
+      }
+    }
   }
 }

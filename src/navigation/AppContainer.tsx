@@ -8,20 +8,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef, reset } from "./RootNavigation";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ScreenStackList } from "./initial-navigation";
-import { useEffect } from "react";
 
 enableScreens();
 
 const Stack = createNativeStackNavigator<ScreenStackList>();
 
 const AppContainer = () => {
-  
-
   return (
     <NavigationContainer ref={navigationRef}>
       <View style={{ flex: 1 }}>
         <Stack.Navigator
-          initialRouteName={"Splash"}
+          // initialRouteName={"Splash"}
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="Splash" component={Splash} />

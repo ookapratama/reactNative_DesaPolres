@@ -20,7 +20,6 @@ import { useCallback, useEffect, useState } from "react";
 import { getDesa } from "../services/desaService";
 import { BASE_URL_CONTACT as WA } from "../../env";
 import _ from "lodash";
-import Pagination from "../components/Pagination";
 
 const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
@@ -187,14 +186,7 @@ const Home = () => {
           </View>
         ) : (
           <VirtualizedList
-            data={
-              filterData.length > 0
-                ? filterData
-                : dataDesa.slice(
-                    (currentPage - 1) * itemPerPages,
-                    currentPage * itemPerPages
-                  )
-            }
+            data={filterData.length > 0 ? filterData : dataDesa}
             getItemCount={(item) => item.length}
             getItem={(data, index) => data[index]}
             initialNumToRender={6}
