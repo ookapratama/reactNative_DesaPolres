@@ -20,20 +20,97 @@ import { useCallback, useEffect, useState } from "react";
 import { getDesa } from "../services/desaService";
 import { BASE_URL_CONTACT as WA } from "../../env";
 import _ from "lodash";
+import Pagination from "../components/Pagination";
 
 const Home = () => {
+  const [refreshing, setRefreshing] = useState(false);
   const [dataDesa, setDataDesa] = useState([]);
   const [loading, setLoading] = useState(true);
   const [visibleModal, setVisibleModal] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [filterData, setFilterData] = useState([]);
 
+  const [totalItems, setTotalItems] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemPages, setItemPages] = useState([]);
+  const itemPerPages = 5;
+
+  // handle pagination
+  // const fetchPagination = async () => {
+  //   setRefreshing(true);
+  //   try {
+  //     let response = await getDesa();
+  //     setTotalPages(
+  //       response.results.length - (response.results.length - itemPerPages)
+  //     );
+  //     let data: [] = response.results.filter(
+  //       (item, index) => index < totalPages
+  //     );
+  //     setItemPages(data);
+  //     setRefreshing(true);
+  //   } catch (error) {
+  //     console.log("msg pagination :", error);
+  //     setRefreshing(false);
+  //   }
+  // };
+
+  const Pagination = () => {
+    const totalPages = Math.ceil(totalItems / itemPerPages);
+
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          marginVertical: 14,
+        }}
+      >
+        <TouchableOpacity
+          onPress={prevPage}
+          style={styles.btnPage}
+          disabled={currentPage === 1}
+        >
+          <Text style={{ color: "white", letterSpacing: 2 }}>Previous</Text>
+        </TouchableOpacity>
+
+        <Text
+          style={{ marginVertical: 20 }}
+        >{`Page ${currentPage} of ${totalPages}`}</Text>
+
+        <TouchableOpacity
+          onPress={nextPage}
+          style={styles.btnPage}
+          disabled={currentPage === totalPages}
+        >
+          <Text style={{ color: "white", letterSpacing: 2 }}>Next</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const setItemsTotal = async () => {
+    const data = await getDesa();
+    setTotalItems(data.results.length);
+    setItemPages(data.results);
+  };
+
+  const nextPage = () => {
+    const totalPages = Math.ceil(totalItems / itemPerPages);
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  // handle fetching data
   const getData = async () => {
     const data = await getDesa();
     setDataDesa(data.results);
     setLoading(false);
   };
 
+  // handle searching
   const handleSearching = (value: any) => {
     console.log(value);
     setSearchValue(value);
@@ -60,9 +137,19 @@ const Home = () => {
     setLoading(true);
     setTimeout(() => {
       getData();
+      setItemsTotal();
       setLoading(false);
     }, 3000);
   }, []);
+
+  // console.log(
+  //   filterData.length > 0
+  //     ? filterData
+  //     : dataDesa.slice(
+  //         (currentPage - 1) * itemPerPages,
+  //         currentPage * itemPerPages
+  //       )
+  // );
 
   return (
     <View style={styles.container}>
@@ -89,6 +176,7 @@ const Home = () => {
         />
       </View>
       <Text style={styles.txtTitle}>Daftar Desa</Text>
+
       <SafeAreaView>
         {/* {dataDesa.map((item) => (
           <Cards id={item.id} desa={item.desa} kecamatan={item.kecamatan} />
@@ -99,16 +187,27 @@ const Home = () => {
           </View>
         ) : (
           <VirtualizedList
-            data={filterData.length > 0 ? filterData : dataDesa}
+            data={
+              filterData.length > 0
+                ? filterData
+                : dataDesa.slice(
+                    (currentPage - 1) * itemPerPages,
+                    currentPage * itemPerPages
+                  )
+            }
             getItemCount={(item) => item.length}
             getItem={(data, index) => data[index]}
-            initialNumToRender={7}
+            initialNumToRender={6}
             renderItem={({ item }) => (
               <Cards id={item.id} desa={item.desa} kecamatan={item.kecamatan} />
             )}
           />
         )}
       </SafeAreaView>
+
+      {/* pagination */}
+      {/* <Pagination /> */}
+
       <TouchableOpacity
         onPress={() => redirectWA()}
         style={{ position: "absolute", bottom: 15, right: 15 }}
@@ -139,7 +238,11 @@ const Home = () => {
             resizeMode="contain"
             style={{ width: "70%", height: "70%" }}
           />
-          <Button title="Kembali" onPress={() => setVisibleModal(false)} />
+          <Button
+            style={{ marginTop: 20 }}
+            title="Kembali"
+            onPress={() => setVisibleModal(false)}
+          />
         </View>
       </Modal>
     </View>
@@ -203,5 +306,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderColor: "black",
     borderWidth: 2,
+  },
+
+  btnPage: {
+    backgroundColor: "#279AF1",
+    padding: 12,
+    margin: 8,
+    borderRadius: 5,
   },
 });
